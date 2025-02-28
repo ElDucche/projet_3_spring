@@ -2,7 +2,6 @@ package elducche.projet_3_spring.security;
 
 import java.io.IOException;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,16 +16,25 @@ import jakarta.servlet.http.HttpServletResponse;
 
 public class JwtAuthFiltre extends OncePerRequestFilter {
 
-    @Autowired
-    private JwtUtils jwtUtils;
+    final JwtUtils jwtUtils;
+    final UserDetailsServiceImplementation userDetailsService;
 
-    @Autowired
-    private UserDetailsServiceImplementation userDetailsService;
+    public JwtAuthFiltre(JwtUtils jwtUtils, UserDetailsServiceImplementation userDetailsService) {
+        this.jwtUtils = jwtUtils;
+        this.userDetailsService = userDetailsService;
+    }
 
+    @SuppressWarnings("null")
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         try {
+            String requestURI = request.getRequestURI();
+            if (requestURI.equals("/api/auth/login") || requestURI.equals("/api/auth/register")) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+
             String jwt = parseJwt(request);
             if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
                 String username = jwtUtils.getUserNameFromJwtToken(jwt);

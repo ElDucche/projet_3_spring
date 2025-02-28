@@ -21,17 +21,19 @@ import elducche.projet_3_spring.security.JwtUtils;
 
 @Service
 public class AuthService {
-    @Autowired
-    private UserRepository userRepository;
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    final UserRepository userRepository;
+    final AuthenticationManager authenticationManager;
+    final PasswordEncoder passwordEncoder;
+    final JwtUtils jwtUtils;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-    
-    @Autowired
-    private JwtUtils jwtUtils;
+    public AuthService(UserRepository userRepository, AuthenticationManager authenticationManager,
+            PasswordEncoder passwordEncoder, JwtUtils jwtUtils) {
+        this.userRepository = userRepository;
+        this.authenticationManager = authenticationManager;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtUtils = jwtUtils;
+    }
 
     public AuthResponse register(RegisterRequest registerRequest) {
         Optional<User> existingUser = userRepository.findByEmail(registerRequest.getEmail());
@@ -49,26 +51,24 @@ public class AuthService {
         userRepository.save(user);
 
         Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(registerRequest.getEmail(), registerRequest.getPassword())
-        );
+                new UsernamePasswordAuthenticationToken(registerRequest.getEmail(), registerRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(authentication);
 
         return new AuthResponse(jwt);
     }
 
-     public AuthResponse login(LoginRequest loginRequest) {
+    public AuthResponse login(LoginRequest loginRequest) {
         // Authentifier l'utilisateur avec email et mot de passe
         Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
-        );
-        
+                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+
         // Mettre à jour le contexte de sécurité
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        
+
         // Générer un token JWT
         String jwt = jwtUtils.generateJwtToken(authentication);
-        
+
         return new AuthResponse(jwt);
     }
 }
