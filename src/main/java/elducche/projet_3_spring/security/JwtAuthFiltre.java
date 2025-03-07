@@ -30,7 +30,11 @@ public class JwtAuthFiltre extends OncePerRequestFilter {
             throws ServletException, IOException {
         try {
             String requestURI = request.getRequestURI();
-            if (requestURI.equals("/api/auth/login") || requestURI.equals("/api/auth/register")) {
+            logger.info("JwtAuthFiltre - URI: " + requestURI);
+            logger.info("JwtAuthFiltre - Method: " + request.getMethod());
+
+            if (requestURI.startsWith("/api/auth")) {
+                logger.info("JwtAuthFiltre - Skipping auth for endpoint: " + requestURI);
                 filterChain.doFilter(request, response);
                 return;
             }

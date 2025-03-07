@@ -2,7 +2,7 @@ package elducche.projet_3_spring.model;
 
 import java.sql.Timestamp;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 import lombok.Data;
 

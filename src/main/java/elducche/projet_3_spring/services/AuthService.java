@@ -1,10 +1,8 @@
 package elducche.projet_3_spring.services;
 
-import java.security.Security;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -15,6 +13,7 @@ import org.springframework.stereotype.Service;
 import elducche.projet_3_spring.dto.AuthResponse;
 import elducche.projet_3_spring.dto.LoginRequest;
 import elducche.projet_3_spring.dto.RegisterRequest;
+import elducche.projet_3_spring.exception.EmailAlreadyExistsException;
 import elducche.projet_3_spring.model.User;
 import elducche.projet_3_spring.repository.UserRepository;
 import elducche.projet_3_spring.security.JwtUtils;
@@ -38,7 +37,7 @@ public class AuthService {
     public AuthResponse register(RegisterRequest registerRequest) {
         Optional<User> existingUser = userRepository.findByEmail(registerRequest.getEmail());
         if (existingUser.isPresent()) {
-            throw new RuntimeException("Cet email est déjà utilisé");
+            throw new EmailAlreadyExistsException("Cet email est déjà utilisé");
         }
 
         User user = new User();

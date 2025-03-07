@@ -2,7 +2,7 @@ package elducche.projet_3_spring.model;
 
 import lombok.Data;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Data
 @Entity
