@@ -2,10 +2,14 @@ package elducche.projet_3_spring.security;
 
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -13,35 +17,41 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
+@Component
 public class JwtAuthFiltre extends OncePerRequestFilter {
 
-    final JwtUtils jwtUtils;
-    final UserDetailsServiceImplementation userDetailsService;
+     private static final Logger logger = LoggerFactory.getLogger(JwtAuthFiltre.class);
 
-    public JwtAuthFiltre(JwtUtils jwtUtils, UserDetailsServiceImplementation userDetailsService) {
-        this.jwtUtils = jwtUtils;
-        this.userDetailsService = userDetailsService;
-    }
+    @Autowired
+    private JwtUtils jwtUtils;
+
+    @Autowired
+    private UserDetailsServiceImplementation userDetailsService;
 
     @SuppressWarnings("null")
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+        String requestURI = request.getRequestURI();
+
+        logger.debug("URI: {}", requestURI);
+        logger.debug("Token: {}", request.getHeader("Authorization"));
+
+        if (requestURI.equals("/api/auth/login") || requestURI.equals("/api/auth/register")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         try {
-            String requestURI = request.getRequestURI();
-            logger.info("JwtAuthFiltre - URI: " + requestURI);
-            logger.info("JwtAuthFiltre - Method: " + request.getMethod());
-
-            if (requestURI.startsWith("/api/auth")) {
-                logger.info("JwtAuthFiltre - Skipping auth for endpoint: " + requestURI);
-                filterChain.doFilter(request, response);
-                return;
-            }
-
             String jwt = parseJwt(request);
+            logger.debug("JWT extracted: {}", jwt != null ? "present" : "absent");
+            
             if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
                 String username = jwtUtils.getUserNameFromJwtToken(jwt);
+                logger.debug("Username from token: {}", username);
 
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
@@ -49,12 +59,18 @@ public class JwtAuthFiltre extends OncePerRequestFilter {
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+                logger.debug("Authentication set in SecurityContext");
+                
+    
+                filterChain.doFilter(request, response);
+                return;
             }
         } catch (Exception e) {
-            logger.error("Impossible d'authentifier l'utilisateur: {}", e);
+            logger.error("Impossible d'authentifier l'utilisateur", e);
         }
 
-        filterChain.doFilter(request, response);
+        // Si on arrive ici, c'est qu'il n'y a pas de token valide
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
     }
 
     private String parseJwt(HttpServletRequest request) {

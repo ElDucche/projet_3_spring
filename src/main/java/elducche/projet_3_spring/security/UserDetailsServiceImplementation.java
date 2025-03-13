@@ -2,6 +2,7 @@ package elducche.projet_3_spring.security;
 
 import java.util.ArrayList;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -12,11 +13,8 @@ import elducche.projet_3_spring.repository.UserRepository;
 
 @Service
 public class UserDetailsServiceImplementation implements UserDetailsService {
-    private final UserRepository userRepository;
-    
-    public UserDetailsServiceImplementation(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+    @Autowired
+    private UserRepository userRepository;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {

@@ -4,10 +4,12 @@ import java.security.Timestamp;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 @Data
 @Entity
 @Table(name = "messages")
+@Accessors(chain = true)
 public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

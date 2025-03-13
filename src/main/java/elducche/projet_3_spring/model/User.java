@@ -2,6 +2,8 @@ package elducche.projet_3_spring.model;
 
 import lombok.Data;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 
 @Data
@@ -16,6 +18,7 @@ public class User {
     @Column(name = "email")
     private String email;
 
+    @JsonIgnore
     @Column(name = "password")
     private String password;
 
