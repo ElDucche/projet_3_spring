@@ -18,15 +18,18 @@ public class Rental {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "description")
+    @Column(name = "description", length = 2000)
     private String description;
 
     @Column(name = "price")
     private String price;
 
+    @Column(name = "picture")
+    private String picture;
+
     @Column(name = "created_at")
     private Timestamp createdAt;
-
+ 
     @Column(name = "updated_at")
     private Timestamp updatedAt;
 
