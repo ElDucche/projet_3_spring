@@ -2,12 +2,14 @@ package elducche.projet_3_spring.model;
 
 import java.security.Timestamp;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 @Data
 @Entity
 @Table(name = "messages")
+@Accessors(chain = true)
 public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
