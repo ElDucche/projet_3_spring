@@ -19,7 +19,7 @@ public class MessageController {
     @Autowired
     private MessageService messageService;
 
-    @PostMapping("/")  // Simplification du mapping
+    @PostMapping // Simplification du mapping
     public ResponseEntity<String> sendMessage(@RequestBody MessageDTO message) {
         return ResponseEntity.ok(messageService.sendMessage(message));
     }
