@@ -1,6 +1,10 @@
 package elducche.projet_3_spring.model;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
+
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import jakarta.persistence.*;
 
@@ -8,6 +12,7 @@ import lombok.Data;
 
 @Data
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 @Table(name = "rentals")
 public class Rental {
     
@@ -27,11 +32,13 @@ public class Rental {
     @Column(name = "picture")
     private String picture;
 
-    @Column(name = "created_at")
-    private Timestamp createdAt;
+    @CreatedDate
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
  
+    @LastModifiedDate
     @Column(name = "updated_at")
-    private Timestamp updatedAt;
+    private LocalDateTime updatedAt;
 
     @Column(name = "owner_id")
     private Long ownerId;

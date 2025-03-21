@@ -2,12 +2,19 @@ package elducche.projet_3_spring.model;
 
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
 
 @Data
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 @Table(name = "users")
 public class User {
     
@@ -25,9 +32,11 @@ public class User {
     @Column(name = "name")
     private String name;
 
+    @CreatedDate
     @Column(name = "created_at")
-    private String createdAt;
+    private LocalDateTime createdAt;
 
+    @LastModifiedDate
     @Column(name = "updated_at")
-    private String updatedAt;
+    private LocalDateTime updatedAt;
 }

@@ -1,6 +1,11 @@
 package elducche.projet_3_spring.model;
 
 import java.security.Timestamp;
+import java.time.LocalDateTime;
+
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -8,6 +13,7 @@ import lombok.experimental.Accessors;
 
 @Data
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 @Table(name = "messages")
 @Accessors(chain = true)
 public class Message {
@@ -18,9 +24,11 @@ public class Message {
     @Column(name = "message")
     private String message;
 
+    @CreatedDate
     @Column(name = "created_at")
-    private Timestamp createdAt;
+    private LocalDateTime createdAt;
 
+    @LastModifiedDate
     @Column(name = "updated_at")
     private Timestamp updatedAt;
 
