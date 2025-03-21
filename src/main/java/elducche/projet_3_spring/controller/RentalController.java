@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import elducche.projet_3_spring.dto.RentalDTO;
+import elducche.projet_3_spring.dto.ResponseDTO;
 import elducche.projet_3_spring.model.Rental;
 import elducche.projet_3_spring.services.RentalService;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,12 +40,12 @@ public class RentalController {
     }
     
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> saveRental(@ModelAttribute RentalDTO rental) {
+    public ResponseEntity<ResponseDTO> saveRental(@ModelAttribute RentalDTO rental) {
         return ResponseEntity.ok(rentalService.saveRental(rental));
     }
 
     @PutMapping("{id}")
-    public String updateRental(@PathVariable Long id, @ModelAttribute RentalDTO rental) {
+    public ResponseDTO updateRental(@PathVariable Long id, @ModelAttribute RentalDTO rental) {
         return rentalService.updateRental(id, rental);
     }
 
