@@ -12,18 +12,16 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
-
+import elducche.projet_3_spring.controller.AuthController;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.NoArgsConstructor;
 
-@NoArgsConstructor
 @Component
 public class JwtAuthFiltre extends OncePerRequestFilter {
 
-     private static final Logger logger = LoggerFactory.getLogger(JwtAuthFiltre.class);
+    private static final Logger logger = LoggerFactory.getLogger(JwtAuthFiltre.class);
 
     @Autowired
     private JwtUtils jwtUtils;
@@ -35,42 +33,40 @@ public class JwtAuthFiltre extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        String requestURI = request.getRequestURI();
-
-        logger.debug("URI: {}", requestURI);
-        logger.debug("Token: {}", request.getHeader("Authorization"));
-
-        if (requestURI.equals("/api/auth/login") || requestURI.equals("/api/auth/register")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
         try {
-            String jwt = parseJwt(request);
-            logger.debug("JWT extracted: {}", jwt != null ? "present" : "absent");
-            
-            if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
-                String username = jwtUtils.getUserNameFromJwtToken(jwt);
-                logger.debug("Username from token: {}", username);
+            String requestURI = request.getRequestURI();
+            logger.debug("Processing request for URI: {}", requestURI);
 
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities());
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-                logger.debug("Authentication set in SecurityContext");
-                
-    
+            // Vérifier si c'est un endpoint public
+            if (requestURI.equals("/api/auth/login") || requestURI.equals("/api/auth/register")) {
                 filterChain.doFilter(request, response);
                 return;
             }
-        } catch (Exception e) {
-            logger.error("Impossible d'authentifier l'utilisateur", e);
-        }
 
-        // Si on arrive ici, c'est qu'il n'y a pas de token valide
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            String jwt = parseJwt(request);
+            logger.debug("JWT token: {}", jwt != null ? "present" : "absent");
+
+            if (jwt == null || !jwtUtils.validateJwtToken(jwt)) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
+            }
+
+            // Configuration de l'authentification
+            String username = jwtUtils.getUserNameFromJwtToken(jwt);
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                    userDetails, null, userDetails.getAuthorities());
+            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            // Important : continuer la chaîne de filtres
+            filterChain.doFilter(request, response);
+        } catch (Exception e) {
+            logger.error("Erreur d'authentification: {}", e.getMessage());
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        } finally {
+            // Ne pas nettoyer le contexte de sécurité ici
+        }
     }
 
     private String parseJwt(HttpServletRequest request) {
