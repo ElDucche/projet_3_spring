@@ -1,6 +1,7 @@
 package elducche.projet_3_spring.security;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +30,19 @@ public class JwtAuthFiltre extends OncePerRequestFilter {
     @Autowired
     private UserDetailsServiceImplementation userDetailsService;
 
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        logger.debug("Request shouldn't be filtered: {}", request.getRequestURI());
+        String path = request.getRequestURI();
+        return path.equals("/") || 
+           path.equals("/api/auth/login") || 
+           path.equals("/api/auth/register") ||
+           path.startsWith("/swagger-ui/") ||
+           path.startsWith("/v3/api-docs") ||
+           path.equals("/swagger-ui.html") ||
+           path.startsWith("/webjars/");
+    }
+
     @SuppressWarnings("null")
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -36,12 +50,6 @@ public class JwtAuthFiltre extends OncePerRequestFilter {
         try {
             String requestURI = request.getRequestURI();
             logger.debug("Processing request for URI: {}", requestURI);
-
-            // Vérifier si c'est un endpoint public
-            if (requestURI.equals("/api/auth/login") || requestURI.equals("/api/auth/register")) {
-                filterChain.doFilter(request, response);
-                return;
-            }
 
             String jwt = parseJwt(request);
             logger.debug("JWT token: {}", jwt != null ? "present" : "absent");
@@ -59,7 +67,6 @@ public class JwtAuthFiltre extends OncePerRequestFilter {
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            // Important : continuer la chaîne de filtres
             filterChain.doFilter(request, response);
         } catch (Exception e) {
             logger.error("Erreur d'authentification: {}", e.getMessage());
