@@ -14,7 +14,7 @@ import lombok.experimental.Accessors;
 @Data
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = "messages")
+@Table(name = "MESSAGES")
 @Accessors(chain = true)
 public class Message {
     @Id
@@ -30,7 +30,7 @@ public class Message {
 
     @LastModifiedDate
     @Column(name = "updated_at")
-    private Timestamp updatedAt;
+    private LocalDateTime updatedAt;
 
     @Column(name = "rental_id")
     private Long rentalId;

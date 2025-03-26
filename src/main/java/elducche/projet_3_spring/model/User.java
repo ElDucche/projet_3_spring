@@ -15,7 +15,7 @@ import jakarta.persistence.*;
 @Data
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = "users")
+@Table(name = "USERS")
 public class User {
     
     @Id
