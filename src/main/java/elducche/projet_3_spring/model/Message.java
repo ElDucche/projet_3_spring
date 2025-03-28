@@ -1,6 +1,5 @@
 package elducche.projet_3_spring.model;
 
-import java.security.Timestamp;
 import java.time.LocalDateTime;
 
 import org.springframework.data.annotation.CreatedDate;
