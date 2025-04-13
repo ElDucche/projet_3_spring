@@ -2,7 +2,6 @@ package elducche.projet_3_spring.services;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.sql.Date;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
@@ -12,17 +11,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+
+import elducche.projet_3_spring.exception.ForbiddenException;
+import elducche.projet_3_spring.exception.NotFoundException;
 import elducche.projet_3_spring.exception.UnauthenticatedException;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 
 import elducche.projet_3_spring.dto.RentalDTO;
+import elducche.projet_3_spring.dto.RentalResponse;
 import elducche.projet_3_spring.dto.ResponseDTO;
-import elducche.projet_3_spring.exception.UnauthenticatedException;
 import elducche.projet_3_spring.model.Rental;
 import elducche.projet_3_spring.repository.RentalRepository;
 import elducche.projet_3_spring.repository.UserRepository;
-import elducche.projet_3_spring.security.UserDetailsServiceImplementation;
 
 import java.io.IOException;
 
@@ -36,8 +35,10 @@ public class RentalService {
 
     private static final String UPLOAD_DIR = "uploads/";
 
-    public List<Rental> getAllRentals() {
-        return rentalRepository.findAll();
+    public RentalResponse getAllRentals() {
+        List<Rental> rentals = rentalRepository.findAll();
+        return new RentalResponse(rentals);
+
     }
 
     public Optional<Rental> getRentalById(Long id) {
@@ -46,9 +47,6 @@ public class RentalService {
 
     public ResponseDTO saveRental(RentalDTO rentalDTO) {
         try {
-            if (rentalDTO.getDescription() == null || rentalDTO.getDescription().length() > 2000) {
-                throw new IllegalArgumentException("Description must be between 1 and 2000 characters");
-            }
             // Gestion du fichier
             String fileName = null;
             if (rentalDTO.getPicture() != null && !rentalDTO.getPicture().isEmpty()) {
@@ -85,14 +83,14 @@ public class RentalService {
     public ResponseDTO updateRental(Long id, RentalDTO rental) {
         final Rental rentalToUpdate = rentalRepository.findById(id)
                 .orElseThrow(
-                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Rental not found with id: " + id));
+                        () -> new NotFoundException("Rental not found with id: " + id));
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
         Long userId = userRepository.findByEmail(userDetails.getUsername())
                 .orElseThrow(() -> new UnauthenticatedException("User not found"))
                 .getId();
         if (!userId.equals(rentalToUpdate.getOwnerId())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not the owner of this rental");
+            throw new ForbiddenException( "You are not the owner of this rental");
         }
         rentalToUpdate.setName(null != rental.getName() ? rental.getName() : rentalToUpdate.getName());
         rentalToUpdate.setPrice(null != rental.getPrice() ? rental.getPrice() : rentalToUpdate.getPrice());

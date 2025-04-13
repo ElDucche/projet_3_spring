@@ -4,13 +4,17 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import elducche.projet_3_spring.dto.RentalDTO;
+import elducche.projet_3_spring.dto.RentalResponse;
 import elducche.projet_3_spring.dto.ResponseDTO;
+import elducche.projet_3_spring.exception.NotFoundException;
 import elducche.projet_3_spring.model.Rental;
 import elducche.projet_3_spring.services.RentalService;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,13 +34,15 @@ public class RentalController {
     private RentalService rentalService;
 
     @GetMapping
-    public List<Rental> getAllRentals() {
+    public RentalResponse getAllRentals() {
         return rentalService.getAllRentals();
     }
 
     @GetMapping("{id}")
-    public Optional<Rental> getUserById(@PathVariable Long id) {
-        return rentalService.getRentalById(id);
+    public Rental getUserById(@PathVariable Long id) {
+        return rentalService.getRentalById(id).orElseThrow(
+            () -> new NotFoundException( "Rental not found")
+        );
     }
     
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
