@@ -27,7 +27,7 @@ public class Rental {
     private String description;
 
     @Column(name = "price")
-    private String price;
+    private Integer price;
 
     @Column(name = "picture")
     private String picture;
