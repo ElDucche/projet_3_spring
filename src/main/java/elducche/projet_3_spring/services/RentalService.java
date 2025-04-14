@@ -22,8 +22,7 @@ import elducche.projet_3_spring.dto.ResponseDTO;
 import elducche.projet_3_spring.model.Rental;
 import elducche.projet_3_spring.repository.RentalRepository;
 import elducche.projet_3_spring.repository.UserRepository;
-
-import java.io.IOException;
+import elducche.projet_3_spring.utils.ImageHelper;
 
 @Service
 public class RentalService {
@@ -33,10 +32,16 @@ public class RentalService {
     @Autowired
     private UserRepository userRepository;
 
-    private static final String UPLOAD_DIR = "uploads/";
+    private static final String BASE_URL = "http://localhost:9000/";
 
     public RentalResponse getAllRentals() {
         List<Rental> rentals = rentalRepository.findAll();
+        rentals.forEach(rental -> {
+            String picture = rental.getPicture();
+            if (picture != null) {
+                rental.setPicture( picture);
+            }
+        });
         return new RentalResponse(rentals);
 
     }
@@ -46,38 +51,26 @@ public class RentalService {
     }
 
     public ResponseDTO saveRental(RentalDTO rentalDTO) {
-        try {
-            // Gestion du fichier
-            String fileName = null;
-            if (rentalDTO.getPicture() != null && !rentalDTO.getPicture().isEmpty()) {
-                fileName = UUID.randomUUID().toString() + "_" + rentalDTO.getPicture().getOriginalFilename();
-                Path path = Paths.get(UPLOAD_DIR + fileName);
-                Files.createDirectories(path.getParent());
-                Files.copy(rentalDTO.getPicture().getInputStream(), path);
-            }
 
-            // Récupération de l'id de l'utilisateur connecté via le token
-            UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
-                    .getPrincipal();
-            Long userId = userRepository.findByEmail(userDetails.getUsername())
-                    .orElseThrow(() -> new UnauthenticatedException("User not found"))
-                    .getId();
+        // Récupération de l'id de l'utilisateur connecté via le token
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal();
+        Long userId = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new UnauthenticatedException("User not found"))
+                .getId();
 
-            // Création de l'entité
-            Rental rental = new Rental();
-            rental.setOwnerId(userId);
-            rental.setName(rentalDTO.getName());
-            rental.setSurface(rentalDTO.getSurface());
-            rental.setPrice(rentalDTO.getPrice());
-            rental.setDescription(rentalDTO.getDescription());
-            rental.setPicture(fileName);
+        // Création de l'entité
+        Rental rental = new Rental();
+        rental.setOwnerId(userId);
+        rental.setName(rentalDTO.getName());
+        rental.setSurface(rentalDTO.getSurface());
+        rental.setPrice(rentalDTO.getPrice());
+        rental.setDescription(rentalDTO.getDescription());
+        rental.setPicture(ImageHelper.saveImage(rentalDTO.getPicture()));
 
-            rentalRepository.save(rental);
-            return new ResponseDTO("Rental created !");
+        rentalRepository.save(rental);
+        return new ResponseDTO("Rental created !");
 
-        } catch (IOException e) {
-            throw new RuntimeException("Error when saving rental", e);
-        }
     }
 
     public ResponseDTO updateRental(Long id, RentalDTO rental) {
@@ -90,7 +83,7 @@ public class RentalService {
                 .orElseThrow(() -> new UnauthenticatedException("User not found"))
                 .getId();
         if (!userId.equals(rentalToUpdate.getOwnerId())) {
-            throw new ForbiddenException( "You are not the owner of this rental");
+            throw new ForbiddenException("You are not the owner of this rental");
         }
         rentalToUpdate.setName(null != rental.getName() ? rental.getName() : rentalToUpdate.getName());
         rentalToUpdate.setPrice(null != rental.getPrice() ? rental.getPrice() : rentalToUpdate.getPrice());

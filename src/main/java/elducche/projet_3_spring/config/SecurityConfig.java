@@ -36,7 +36,9 @@ public class SecurityConfig {
         "/swagger-ui.html",
         "/v3/api-docs",
         "/webjars/**",
-        "/error"
+        "/error",
+        "/rentals-images/**",
+        "/rentals-images",
     };
 
     @Bean
@@ -62,6 +64,7 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(PUBLIC_URLS).permitAll()
+                        .requestMatchers("/images/**").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthFiltre(), UsernamePasswordAuthenticationFilter.class);
 
