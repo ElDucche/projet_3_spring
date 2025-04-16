@@ -3,6 +3,7 @@ package elducche.projet_3_spring.controller;
 import java.util.List;
 import java.util.Optional;
 
+import elducche.projet_3_spring.dto.Rentals;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -29,13 +30,13 @@ public class RentalController {
     @Autowired
     private RentalService rentalService;
 
-    @GetMapping
-    public List<Rental> getAllRentals() {
-        return rentalService.getAllRentals();
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public Rentals getAllRentals() {
+        return new Rentals(rentalService.getAllRentals());
     }
 
     @GetMapping("{id}")
-    public Optional<Rental> getUserById(@PathVariable Long id) {
+    public Rental getUserById(@PathVariable Long id) {
         return rentalService.getRentalById(id);
     }
     
