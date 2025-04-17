@@ -19,6 +19,7 @@ import org.springframework.web.cors.CorsConfiguration;
 
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
 import java.util.Arrays;
 
 import elducche.projet_3_spring.security.JwtAuthFiltre;
@@ -29,13 +30,15 @@ import elducche.projet_3_spring.security.UserDetailsServiceImplementation;
 public class SecurityConfig {
 
     private static final String[] PUBLIC_URLS = {
-        "/api/auth/login",
-        "/api/auth/register",
-        "/swagger-ui/**",
-        "/v3/api-docs/**",
-        "/swagger-ui.html",
-        "/v3/api-docs",
-        "/webjars/**"
+            "/api/auth/login",
+            "/api/auth/register",
+            "/swagger-ui/**",
+            "/v3/api-docs/**",
+            "/swagger-ui.html",
+            "/v3/api-docs",
+            "/webjars/**",
+            "/uploads/**",
+            "/error"
     };
 
     @Bean
@@ -61,6 +64,7 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(PUBLIC_URLS).permitAll()
+                        .requestMatchers("/uploads/**").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthFiltre(), UsernamePasswordAuthenticationFilter.class);
 

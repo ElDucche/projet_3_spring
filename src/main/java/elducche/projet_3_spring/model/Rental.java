@@ -1,6 +1,7 @@
 package elducche.projet_3_spring.model;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 
 import jakarta.persistence.*;
 
@@ -28,10 +29,10 @@ public class Rental {
     private String picture;
 
     @Column(name = "created_at")
-    private Timestamp createdAt;
+    private Instant createdAt;
  
     @Column(name = "updated_at")
-    private Timestamp updatedAt;
+    private Instant updatedAt;
 
     @Column(name = "owner_id")
     private Long ownerId;
