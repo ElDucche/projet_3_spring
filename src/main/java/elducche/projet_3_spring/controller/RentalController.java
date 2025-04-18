@@ -17,6 +17,7 @@ import elducche.projet_3_spring.dto.ResponseDTO;
 import elducche.projet_3_spring.exception.NotFoundException;
 import elducche.projet_3_spring.model.Rental;
 import elducche.projet_3_spring.services.RentalService;
+import elducche.projet_3_spring.exception.NotFoundException;
 import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -40,8 +41,7 @@ public class RentalController {
 
     @GetMapping("{id}")
     public Rental getRentalById(@PathVariable Long id) {
-        return rentalService.getRentalById(id).orElseThrow(
-                () -> new NotFoundException("Rental not found"));
+        return rentalService.getRentalById(id);
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

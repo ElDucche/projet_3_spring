@@ -31,17 +31,17 @@ public class JwtAuthFiltre extends OncePerRequestFilter {
     private UserDetailsServiceImplementation userDetailsService;
 
     @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) {
-        logger.debug("Request shouldn't be filtered: {}", request.getRequestURI());
-        String path = request.getRequestURI();
-        return path.equals("/") || 
+protected boolean shouldNotFilter(HttpServletRequest request) {
+    String path = request.getRequestURI();
+    return path.startsWith("/uploads") || // Exclude static resources
+           path.equals("/") || 
            path.equals("/api/auth/login") || 
            path.equals("/api/auth/register") ||
            path.startsWith("/swagger-ui/") ||
            path.startsWith("/v3/api-docs") ||
            path.equals("/swagger-ui.html") ||
            path.startsWith("/webjars/");
-    }
+}
 
     @SuppressWarnings("null")
     @Override

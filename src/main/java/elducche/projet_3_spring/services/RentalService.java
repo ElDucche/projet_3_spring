@@ -2,6 +2,11 @@ package elducche.projet_3_spring.services;
 
 import java.util.List;
 import java.util.Optional;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,6 +25,7 @@ import elducche.projet_3_spring.repository.RentalRepository;
 import elducche.projet_3_spring.repository.UserRepository;
 import elducche.projet_3_spring.utils.ImageHelper;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class RentalService {
@@ -32,7 +38,7 @@ public class RentalService {
     @Autowired
     private ImageHelper imageHelper;
 
-    private final Path storageLocation = Path.get("uploads");
+    private final Path storageLocation = Paths.get("uploads");
   private static final String UPLOAD_DIR = "/uploads/";
 
     public List<Rental> getAllRentals() {
@@ -111,7 +117,7 @@ public class RentalService {
 
   private String storePicture(MultipartFile picture) {
         try {
-        String fileName = System.currentTimeMillis() + "_" + picture.getOriginalFilename();
+            String fileName = System.currentTimeMillis() + "_" + picture.getOriginalFilename();
             Path targetLocation = storageLocation.resolve(fileName);
             Files.copy(picture.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
             return fileName;
