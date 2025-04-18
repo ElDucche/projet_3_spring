@@ -19,6 +19,7 @@ import elducche.projet_3_spring.model.Rental;
 import elducche.projet_3_spring.services.RentalService;
 import jakarta.validation.Valid;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,9 +33,9 @@ public class RentalController {
     @Autowired
     private RentalService rentalService;
 
-    @GetMapping
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public RentalResponse getAllRentals() {
-        return rentalService.getAllRentals();
+        return new RentalResponse(rentalService.getAllRentals());
     }
 
     @GetMapping("{id}")
@@ -58,6 +59,11 @@ public class RentalController {
     @PutMapping("{id}")
     public ResponseDTO updateRental(@PathVariable Long id, @ModelAttribute RentalDTO rental) {
         return rentalService.updateRental(id, rental);
+    }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<ResponseDTO> deleteRental(@PathVariable Long id) {
+        return ResponseEntity.ok(rentalService.deleteRental(id));
     }
 
 }

@@ -1,6 +1,8 @@
 package elducche.projet_3_spring.utils;
 
-import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -9,43 +11,41 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
 
-@NoArgsConstructor
+@Component
 public class ImageHelper {
 
-    private static final String UPLOAD_DIR = "rentals-images/";
+    @Value("${app.upload.dir:rentals-images}")
+    private String uploadDir;  // Ajout du point-virgule
 
-    public static String saveImage(MultipartFile file) {
-
+    @Value("${app.base.url:http://localhost:9000}")
+    private String baseUrl;
+    // Retrait du mot-clé 'static'
+    public String saveImage(MultipartFile file) {
         try {
             if (file.isEmpty()) {
                 throw new RuntimeException("File should not be empty");
             }
 
-            // Get the file's original filename
-            String fileName = UUID.randomUUID().toString() + "_" +file.getOriginalFilename();
+            String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
 
-            // Check if the file has a valid filename
             if (fileName == null || fileName.contains("..")) {
                 throw new RuntimeException("The filename is invalid");
             }
 
-            // Ensure the uploads directory exists
-            Path uploadPath = Paths.get(UPLOAD_DIR);
+            Path uploadPath = Paths.get(uploadDir);
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
             }
 
-            // Save the file to the target location
             Path filePath = uploadPath.resolve(fileName);
             Files.copy(file.getInputStream(), filePath);
 
-            return UPLOAD_DIR + fileName;
+            return baseUrl + "/" + uploadDir + "/" + fileName;
 
         } catch (IOException e) {
             e.printStackTrace();
-            throw new RuntimeException("Could not upload the file: " + e.getMessage());
+            throw new RuntimeException("Failed to store file", e);
         }
-
     }
 }
 

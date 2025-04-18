@@ -37,8 +37,7 @@ public class SecurityConfig {
         "/v3/api-docs",
         "/webjars/**",
         "/error",
-        "/rentals-images/**",
-        "/rentals-images",
+        "upload/** "
     };
 
     @Bean
@@ -64,7 +63,7 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(PUBLIC_URLS).permitAll()
-                        .requestMatchers("/images/**").permitAll()
+                        .requestMatchers("/uploads/**").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthFiltre(), UsernamePasswordAuthenticationFilter.class);
 
