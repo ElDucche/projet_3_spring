@@ -19,6 +19,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+
+
 @Component
 public class JwtAuthFiltre extends OncePerRequestFilter {
 
@@ -85,4 +87,7 @@ protected boolean shouldNotFilter(HttpServletRequest request) {
 
         return null;
     }
+
+
+
 }

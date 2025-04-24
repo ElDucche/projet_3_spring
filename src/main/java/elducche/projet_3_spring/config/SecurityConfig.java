@@ -23,6 +23,7 @@ import java.util.Arrays;
 
 import elducche.projet_3_spring.security.JwtAuthFiltre;
 import elducche.projet_3_spring.security.UserDetailsServiceImplementation;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 
 @Configuration
 @EnableWebSecurity
@@ -65,6 +66,7 @@ public class SecurityConfig {
                         .requestMatchers(PUBLIC_URLS).permitAll()
                         .requestMatchers("/uploads/**").permitAll()
                         .anyRequest().authenticated())
+                .securityMatcher("/**") // Apply security only to specific endpoints
                 .addFilterBefore(jwtAuthFiltre(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -95,5 +97,8 @@ public class SecurityConfig {
     public UserDetailsService userDetailsService() {
         return new UserDetailsServiceImplementation();
     }
-
+@Bean
+public WebSecurityCustomizer webSecurityCustomizer() {
+    return (web) -> web.ignoring().requestMatchers("/uploads/**");
+}
 }
