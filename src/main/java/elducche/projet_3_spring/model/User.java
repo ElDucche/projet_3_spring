@@ -8,7 +8,9 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.*;
 
@@ -34,9 +36,13 @@ public class User {
 
     @CreatedDate
     @Column(name = "created_at")
+    @JsonFormat(pattern = "yyyy/MM/dd")
+    @JsonProperty("created_at")
     private LocalDateTime createdAt;
 
     @LastModifiedDate
     @Column(name = "updated_at")
+    @JsonFormat(pattern = "yyyy/MM/dd")
+    @JsonProperty("updated_at")
     private LocalDateTime updatedAt;
 }
