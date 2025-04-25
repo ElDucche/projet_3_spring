@@ -1,6 +1,13 @@
 package elducche.projet_3_spring.model;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
+
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.*;
 
@@ -8,7 +15,8 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "rentals")
+@EntityListeners(AuditingEntityListener.class)
+@Table(name = "RENTALS")
 public class Rental {
     
     @Id
@@ -22,16 +30,22 @@ public class Rental {
     private String description;
 
     @Column(name = "price")
-    private String price;
+    private Integer price;
 
     @Column(name = "picture")
     private String picture;
 
-    @Column(name = "created_at")
-    private Timestamp createdAt;
+    @CreatedDate
+    @Column(name = "created_at", updatable = false)
+    @JsonFormat(pattern = "yyyy/MM/dd")
+    @JsonProperty("created_at")
+    private LocalDateTime createdAt;
  
+    @LastModifiedDate
     @Column(name = "updated_at")
-    private Timestamp updatedAt;
+    @JsonFormat(pattern = "yyyy/MM/dd")
+    @JsonProperty("updated_at")
+    private LocalDateTime updatedAt;
 
     @Column(name = "owner_id")
     private Long ownerId;

@@ -23,6 +23,7 @@ import java.util.Arrays;
 
 import elducche.projet_3_spring.security.JwtAuthFiltre;
 import elducche.projet_3_spring.security.UserDetailsServiceImplementation;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 
 @Configuration
 @EnableWebSecurity
@@ -35,7 +36,9 @@ public class SecurityConfig {
         "/v3/api-docs/**",
         "/swagger-ui.html",
         "/v3/api-docs",
-        "/webjars/**"
+        "/webjars/**",
+        "/error",
+        "upload/** "
     };
 
     @Bean
@@ -61,7 +64,9 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(PUBLIC_URLS).permitAll()
+                        .requestMatchers("/uploads/**").permitAll()
                         .anyRequest().authenticated())
+                .securityMatcher("/**") // Apply security only to specific endpoints
                 .addFilterBefore(jwtAuthFiltre(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -92,5 +97,8 @@ public class SecurityConfig {
     public UserDetailsService userDetailsService() {
         return new UserDetailsServiceImplementation();
     }
-
+@Bean
+public WebSecurityCustomizer webSecurityCustomizer() {
+    return (web) -> web.ignoring().requestMatchers("/uploads/**");
+}
 }
