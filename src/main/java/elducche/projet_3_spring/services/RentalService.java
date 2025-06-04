@@ -1,7 +1,6 @@
 package elducche.projet_3_spring.services;
 
 import java.util.List;
-import java.util.Optional;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -18,7 +17,6 @@ import elducche.projet_3_spring.exception.NotFoundException;
 import elducche.projet_3_spring.exception.UnauthenticatedException;
 
 import elducche.projet_3_spring.dto.RentalDTO;
-import elducche.projet_3_spring.dto.RentalResponse;
 import elducche.projet_3_spring.dto.ResponseDTO;
 import elducche.projet_3_spring.model.Rental;
 import elducche.projet_3_spring.repository.RentalRepository;
