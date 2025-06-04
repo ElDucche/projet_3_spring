@@ -18,19 +18,16 @@ Ce projet est une API RESTful développée avec Spring Boot pour gérer une appl
     ```
 
 2.  **Configuration de la base de données :**
-    *   Assurez-vous qu'une instance MySQL est en cours d'exécution.
-    *   Modifiez le fichier `src/main/resources/application.properties` pour configurer l'URL de la base de données, le nom d'utilisateur et le mot de passe :
-        ```properties
-        spring.datasource.url=jdbc:mysql://localhost:3306/mydb
-        spring.datasource.username=user
-        spring.datasource.password=password
-        ```
-    *   La base de données (`mydb` dans cet exemple) doit exister. Hibernate (`spring.jpa.hibernate.ddl-auto=update`) créera ou mettra à jour les tables au démarrage.
+     * Lancez le terminal et rendez-vous à la racine du projet. 
+    ```bash
+    cd infra
+    docker compose up
+    ```
 
-3.  **Configuration JWT :**
+4.  **Configuration JWT :**
     *   Une clé secrète JWT est définie dans `application.properties` (`app.jwt.secret`). Pour la production, utilisez une clé plus sécurisée et gérez-la via des variables d'environnement ou un système de gestion des secrets.
 
-4.  **Configuration du stockage des images :**
+5.  **Configuration du stockage des images :**
     *   Par défaut, les images uploadées sont stockées dans un dossier `uploads` à la racine du projet. Ce chemin est défini dans `application.properties` (`app.upload.dir`) et utilisé par `ImageHelper.java`.
     *   L'URL de base pour accéder aux images est configurée via `app.base.url`.
 
