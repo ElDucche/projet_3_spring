@@ -48,6 +48,7 @@ public class Rental {
     private LocalDateTime updatedAt;
 
     @Column(name = "owner_id")
+    @JsonProperty("owner_id")
     private Long ownerId;
 
     @Column(name= "surface")
